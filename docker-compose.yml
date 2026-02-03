@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: sudoku_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sudoku_user
+      POSTGRES_PASSWORD: sudoku_password
+      POSTGRES_DB: sudoku_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sudoku_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg2://sudoku_user:sudoku_password@postgres:5432/sudoku_db
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+
